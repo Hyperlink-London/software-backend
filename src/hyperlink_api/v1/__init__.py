@@ -1,0 +1,1 @@
+API_VERSION = __name__.split('.')[-1]
