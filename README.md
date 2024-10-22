@@ -14,6 +14,31 @@ You can install `hyperlink-api` via git:
 ```bash
 git clone https://github.com/Hyperlink-London/hyperlink-backend.git
 cd hyperlink-api
+```
+
+then create a conda envrioemnt (you should install conda [here](https://anaconda.org/anaconda/conda))
+
+```bash
+conda create --name hyperlink-backend python=3.10
+```
+
+then activate the conda environment
+
+```bash
+conda activate hyperlink-backend
+```
+
+then pip install in the conda environment
+
+```bash
 pip install -r requirements.txt
-pip install .
+pip install -e .
+```
+
+## To run
+
+You can run the Hyperlink Data Dashboard by running:
+
+```bash
+hyperlink-backend
 ```
