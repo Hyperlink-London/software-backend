@@ -8,7 +8,7 @@ build-backend = "hatchling.build"
 name = "hyperlink-api"
 description = "An API for interfacing with hyperlink databases"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8, <3.11"
 license = { text = "BSD 3-Clause License" }
 authors = [
     { email = "barnish.harry@gmail.com", name = "Harry Barnish" },
