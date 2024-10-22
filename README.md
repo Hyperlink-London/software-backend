@@ -5,7 +5,7 @@ This project, hyperlink-api, is a Python-based API designed to interface with hy
 
 ## Overview
 
-hyperlink-api is a Python-based API designed to interface with hyperlink databases. It provides a set of endpoints to interact with microcontroller data and experiments.
+hyperlink-api is a Python-based API designed to interface with hyperlink databases. It provides a set of endpoints to interact with data defined in the hyperlink_data_models.
 
 ## Installation
 
