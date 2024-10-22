@@ -1,4 +1,4 @@
-# hyperlink-api
+# Hyperlink-backend
 
 
 This project, hyperlink-api, is a Python-based API designed to interface with hyperlink databases. It leverages the FastAPI and SQLModel libraries to provide a set of endpoints for managing and interacting with microcontroller data and experiments. The API supports CRUD operations, allowing users to create, read, update, and delete data related to both microcontrollers and experiments.
