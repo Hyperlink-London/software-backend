@@ -106,3 +106,14 @@ ENV/
 .idea/
 
 log-api.log
+
+.DS_Store
+
+*__pycache__/
+
+# dotenv
+.env
+
+# virtualenv
+venv/
+ENV/
