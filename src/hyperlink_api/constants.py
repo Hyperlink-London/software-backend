@@ -1,14 +1,17 @@
 import os
 from dotenv import load_dotenv
 
-# load the environment variables from the .env file which should be created in the src/hyperlink_api directory of the project
+# Determine the root directory of the project (one level up from current directory)
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
-env_file_path = os.path.join(current_script_dir, '.env')
+project_root_dir = os.path.dirname(current_script_dir)
+
+# Path to the .env file in the root directory
+env_file_path = os.path.join(project_root_dir, '.env')
 
 # Load the environment variables from the .env file
 load_dotenv(dotenv_path=env_file_path)
 
-
+# Access the environment variables
 APPLICATION_HOST = os.getenv("APPLICATION_HOST")
 APPLICATION_HOST_DEV = os.getenv("APPLICATION_HOST_DEV")
 APPLICATION_PORT = os.getenv("APPLICATION_PORT")

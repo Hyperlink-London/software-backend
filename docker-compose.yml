@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env  # Use the .env file for environment variables
+    depends_on:
+      - db
+    networks:
+      - hyperlink_network  # Attach to the custom network
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: hyperlink
+      POSTGRES_PASSWORD: hyperlink_psw
+      POSTGRES_DB: hyperlink_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hyperlink_network  # Attach to the custom network
+
+volumes:
+  postgres_data:
+
+networks:
+  hyperlink_network:
+    driver: bridge
