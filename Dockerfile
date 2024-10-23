@@ -17,5 +17,5 @@ RUN pip install -e .
 # Expose the port your FastAPI app runs on
 EXPOSE 8000
 
-# Print environment variables for debugging before starting the app
-CMD hyperlink-api
+# Run the create_tables.py script before starting the API
+CMD ["sh", "-c", "python create_tables.py && hyperlink-api"]

@@ -11,5 +11,7 @@ __email__ = "barnish.harry@gmail.com"
 
 from .v1.checkers import *
 
+from .v1.test import *
+
 from ._application import app
 from .cli import cli
