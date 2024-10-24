@@ -26,7 +26,7 @@ services:
       - hyperlink_network  # Attach to the custom network
 
 volumes:
-  postgres_data:
+  postgres_data:  # TODO: Define a volume for the PostgreSQL data
 
 networks:
   hyperlink_network:
