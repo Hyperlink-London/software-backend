@@ -8,18 +8,17 @@ class PodDataBase(sqlmodel.SQLModel):
     """
     Base class for pod data models, defining common sensor attributes.
     """
-    # experiment
-    pod_id: str = sqlmodel.Field(  # this will be used to track design iterations
-        index=True,
-        # foreign_key="pod.id"
-    )
-
-    # sensor
+    # sensors
     temperature_celsius_brake: Optional[float] = None
     temperature_celsius_propulsion_1: Optional[float] = None
     temperature_celsius_propulsion_2: Optional[float] = None
     rpm: Optional[float] = None
     speed_m_per_s: Optional[float] = None
+
+    # component versions
+    brake_version: Optional[str] = None
+    propulsion_version: Optional[str] = None
+    pod_version: Optional[str] = None
 
 
 class PodData(PodDataBase, table=True):
