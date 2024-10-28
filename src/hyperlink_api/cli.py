@@ -17,16 +17,19 @@ def launch_api_server(
     """Launch the hyperlink API server."""
     set_dev_mode(dev)
     command = ['uvicorn', 'hyperlink_api:app']
-    if not dev:
-        port = APPLICATION_PORT
-        host = APPLICATION_HOST
+
+    # Set default values if in dev mode
+    if dev:  # TODO: add support for other dev environments
+        command.append('--reload')
+    else:
+        command.append('--workers')
+        command.append('1')
+
+    port = APPLICATION_PORT
+    host = APPLICATION_HOST
+    # Update the command with host and port information
     command.extend(['--port', str(port)])
     command.extend(['--host', host])
-    if not dev:
-        command.extend(['--workers', '1'])
-    else:
-        command.extend(['--reload'])
 
     logger.warning(f"Launching API server at {host}:{port}")
-
     subprocess.run(command)

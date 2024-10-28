@@ -18,4 +18,4 @@ RUN pip install -e .
 EXPOSE 8000
 
 # Run the create_tables.py script before starting the API
-CMD ["sh", "-c", "python create_tables.py && hyperlink-api"]
+CMD ["sh", "-c", "python create_tables.py && hyperlink-api --dev"]

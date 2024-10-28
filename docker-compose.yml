@@ -6,11 +6,16 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env  # Use the .env file for environment variables
+      - .env
     depends_on:
       - db
+    volumes:
+      - .:/app  # Map the local directory to the container's working directory
+    x-deploy:
+      filewatcher:
+        sync: true  # Enable sync action for automatic refresh on file changes
     networks:
-      - hyperlink_network  # Attach to the custom network
+      - hyperlink_network
 
   db:
     image: postgres:13
@@ -26,7 +31,7 @@ services:
       - hyperlink_network  # Attach to the custom network
 
 volumes:
-  postgres_data:  # TODO: Define a volume for the PostgreSQL data
+  postgres_data:
 
 networks:
   hyperlink_network:

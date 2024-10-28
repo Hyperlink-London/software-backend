@@ -117,3 +117,5 @@ log-api.log
 # virtualenv
 venv/
 ENV/
+
+postgresql/data
