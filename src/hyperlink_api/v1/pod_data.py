@@ -43,7 +43,6 @@ def create_microcontroller_data(data: PodDataCreate) -> PodData:
         return PodData()
 
 
-# read last n pod data entries where n is 100 unless specified
 @app.get(
     path=f"/{API_VERSION}/{ENDPOINT_NAME}/read_pod_data",
     response_model=list[PodData]
@@ -53,7 +52,7 @@ def read_pod_data(n: int = 100) -> list[PodData]:
     Fetches the last n data points from the pod data table.
 
     Parameters:
-        n: The number of data points to retrieve.
+        n: The number of data points to retrieve, 100 by default.
 
     Returns:
         A list of PodDataRead objects, containing the retrieved data.
