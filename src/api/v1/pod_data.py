@@ -25,16 +25,20 @@ async def websocket_data_endpoint(websocket: WebSocket):
         logger.info(f"Client connected. Total connections: {len(websocket_handler.active_connections)}")
         
         while True:
-            data = await websocket.receive_text()
+            data = await websocket.receive_json()
             try:
-                json_data = json.loads(data)
-                logger.info(f"Received data: {json_data}")
-                print(f"Received data: {json_data}")
-                response = {
-                    "message": "Data received successfully",
-                    "received_data": json_data
-                }
-                await websocket.send_json(response)
+                pod_data_create = PodDataCreate(**data)
+                with sqlmodel.Session(engine) as session:
+                    pod_data = PodData.from_orm(pod_data_create)
+                    session.add(pod_data)
+                    session.commit()
+                    session.refresh(pod_data)
+
+                await websocket.send_json({
+                    "message": "Pod data created successfully",
+                    "data": pod_data.dict(),
+                })
+                await websocket_handler.broadcast_message(f"New pod data created: {pod_data.dict()}")
             except json.JSONDecodeError:
                 await websocket.send_json({"error": "Invalid JSON received"})
     except WebSocketDisconnect:
@@ -51,6 +55,10 @@ async def websocket_create_pod_data(websocket: WebSocket):
     """
     WebSocket handler for creating pod data entries.
     """
+
+    await websocket.accept()
+    logger.info("WebSocket connection accepted")
+
     await websocket_handler.add_connection(websocket)
     try:
         while True:
