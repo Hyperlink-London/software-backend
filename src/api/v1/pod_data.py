@@ -1,70 +1,76 @@
-"""
-Write pod data into the poddata table.
-"""
 import sqlmodel
-from fastapi import APIRouter
-
-from src.core.logger import logger
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from src.core.database import engine
-
-from hyperlink_data_models.pod_data import (
-    PodData,
-    PodDataCreate,
-    PodDataRead,
-)
+from hyperlink_data_models.pod_data import PodData, PodDataCreate
+from src.core.logger import logger
+from src.core.websocket_handler import WebSocketHandler
 
 router = APIRouter()
+websocket_handler = WebSocketHandler()
 
 
-@router.post(
-    path=f"/create_pod_data",
-    response_model=PodData
-)
-def create_microcontroller_data(data: PodDataCreate) -> PodData:
+@router.websocket("/ws/connect")
+async def websocket_connect_endpoint(websocket: WebSocket):
     """
-    Creates a new pod data entry in the database.
-
-    Parameters:
-        data: The data to be added, encapsulated in a PodDataCreate object.
-
-    Returns:
-        The newly created PodData object.
+    Endpoint to establish a WebSocket connection.
     """
+    await websocket_handler.connect_websocket(websocket)
+
+
+@router.websocket("/ws/create_pod_data")
+async def websocket_create_pod_data(websocket: WebSocket):
+    """
+    WebSocket handler for creating pod data entries.
+    """
+    await websocket_handler.add_connection(websocket)
     try:
-        with sqlmodel.Session(engine) as session:
-            data = PodData.from_orm(data)
-            session.add(data)
-            session.commit()
-            session.refresh(data)
-            return data
+        while True:
+            data = await websocket.receive_json()
+            pod_data_create = PodDataCreate(**data)
+            with sqlmodel.Session(engine) as session:
+                pod_data = PodData.from_orm(pod_data_create)
+                session.add(pod_data)
+                session.commit()
+                session.refresh(pod_data)
+
+            await websocket.send_json({
+                "message": "Pod data created successfully",
+                "data": pod_data.dict(),
+            })
+            await websocket_handler.broadcast_message(f"New pod data created: {pod_data.dict()}")
+
+    except WebSocketDisconnect:
+        websocket_handler.remove_connection(websocket)
     except Exception as e:
         logger.error(f"An error occurred: {e}")
-        return PodData()
+        await websocket.send_json({"error": str(e)})
 
 
-@router.get(
-    path=f"/read_pod_data",
-    response_model=list[PodData]
-)
-def read_pod_data(n: int = 100) -> list[PodData]:
+@router.websocket("/ws/read_pod_data")
+async def websocket_read_pod_data(websocket: WebSocket):
     """
-    Fetches the last n data points from the pod data table.
-
-    Parameters:
-        n: The number of data points to retrieve, 100 by default.
-
-    Returns:
-        A list of PodDataRead objects, containing the retrieved data.
+    WebSocket handler for reading pod data entries.
     """
+    await websocket_handler.add_connection(websocket)
     try:
-        statement = sqlmodel.select(PodData) \
-            .order_by(PodData.time) \
-            .limit(n)
+        while True:
+            # Receive the number of records to fetch from the client
+            message = await websocket.receive_text()
+            n = int(message) if message.isdigit() else 100
 
-        with sqlmodel.Session(engine) as session:
-            data = session.exec(statement).all()
-            logger.debug(f"encountered no errors")
-            return [PodData.from_orm(row) for row in data]
+            statement = (
+                sqlmodel.select(PodData)
+                .order_by(PodData.time)
+                .limit(n)
+            )
+
+            with sqlmodel.Session(engine) as session:
+                data = session.exec(statement).all()
+                pod_data_list = [pod_data.dict() for pod_data in data]
+
+            await websocket.send_json({"data": pod_data_list})
+    except WebSocketDisconnect:
+        websocket_handler.remove_connection(websocket)
     except Exception as e:
         logger.error(f"An error occurred: {e}")
-        return []
+        await websocket.send_json({"error": str(e)})
