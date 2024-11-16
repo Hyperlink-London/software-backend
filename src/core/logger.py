@@ -7,7 +7,7 @@ from datetime import datetime
 from src.core.constants import current_script_dir
 
 
-log_level = logging.WARNING
+log_level = logging.INFO
 log_file = f"logs/log-api-{datetime.now().strftime('%d-%m-%Y')}.log"
 log_file_dir = os.path.join(current_script_dir, log_file)
 

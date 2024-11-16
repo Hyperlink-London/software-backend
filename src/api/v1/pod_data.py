@@ -4,73 +4,43 @@ from src.core.database import engine
 from hyperlink_data_models.pod_data import PodData, PodDataCreate
 from src.core.logger import logger
 from src.core.websocket_handler import WebSocketHandler
+import json
 
 router = APIRouter()
 websocket_handler = WebSocketHandler()
 
 
-@router.websocket("/ws/connect")
-async def websocket_connect_endpoint(websocket: WebSocket):
+@router.websocket("/ws")
+async def websocket_data_endpoint(websocket: WebSocket):
     """
-    Endpoint to establish a WebSocket connection.
+    WebSocket endpoint that handles connections using the WebSocketHandler.
     """
-    await websocket_handler.connect_websocket(websocket)
-
-
-@router.websocket("/ws/create_pod_data")
-async def websocket_create_pod_data(websocket: WebSocket):
-    """
-    WebSocket handler for creating pod data entries.
-    """
-    await websocket_handler.add_connection(websocket)
+    # First, explicitly accept the connection
+    await websocket.accept()
+    logger.info("WebSocket connection accepted")
+    
     try:
+        # Then add to the handler's active connections
+        websocket_handler.active_connections.append(websocket)
+        logger.info(f"Client connected. Total connections: {len(websocket_handler.active_connections)}")
+        
         while True:
-            data = await websocket.receive_json()
-            pod_data_create = PodDataCreate(**data)
-            with sqlmodel.Session(engine) as session:
-                pod_data = PodData.from_orm(pod_data_create)
-                session.add(pod_data)
-                session.commit()
-                session.refresh(pod_data)
-
-            await websocket.send_json({
-                "message": "Pod data created successfully",
-                "data": pod_data.dict(),
-            })
-            await websocket_handler.broadcast_message(f"New pod data created: {pod_data.dict()}")
-
+            data = await websocket.receive_text()
+            try:
+                json_data = json.loads(data)
+                logger.info(f"Received data: {json_data}")
+                print(f"Received data: {json_data}")
+                response = {
+                    "message": "Data received successfully",
+                    "received_data": json_data
+                }
+                await websocket.send_json(response)
+            except json.JSONDecodeError:
+                await websocket.send_json({"error": "Invalid JSON received"})
     except WebSocketDisconnect:
-        websocket_handler.remove_connection(websocket)
+        logger.info("Client disconnected")
+        websocket_handler.active_connections.remove(websocket)
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
-        await websocket.send_json({"error": str(e)})
-
-
-@router.websocket("/ws/read_pod_data")
-async def websocket_read_pod_data(websocket: WebSocket):
-    """
-    WebSocket handler for reading pod data entries.
-    """
-    await websocket_handler.add_connection(websocket)
-    try:
-        while True:
-            # Receive the number of records to fetch from the client
-            message = await websocket.receive_text()
-            n = int(message) if message.isdigit() else 100
-
-            statement = (
-                sqlmodel.select(PodData)
-                .order_by(PodData.time)
-                .limit(n)
-            )
-
-            with sqlmodel.Session(engine) as session:
-                data = session.exec(statement).all()
-                pod_data_list = [pod_data.dict() for pod_data in data]
-
-            await websocket.send_json({"data": pod_data_list})
-    except WebSocketDisconnect:
-        websocket_handler.remove_connection(websocket)
-    except Exception as e:
-        logger.error(f"An error occurred: {e}")
-        await websocket.send_json({"error": str(e)})
+        logger.error(f"Error in WebSocket connection: {str(e)}")
+        if websocket in websocket_handler.active_connections:
+            websocket_handler.active_connections.remove(websocket)
