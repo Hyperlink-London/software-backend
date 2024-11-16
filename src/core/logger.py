@@ -8,7 +8,7 @@ from src.core.constants import current_script_dir
 
 
 log_level = logging.WARNING
-log_file = f"log-api-{datetime.now().strftime('%d-%m-%Y')}.log"
+log_file = f"logs/log-api-{datetime.now().strftime('%d-%m-%Y')}.log"
 log_file_dir = os.path.join(current_script_dir, log_file)
 
 logger = logging.getLogger(__name__)
