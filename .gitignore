@@ -81,7 +81,7 @@ celerybeat-schedule
 *.sage.py
 
 # dotenv
-src/hyperlink_api/.env
+src/api/.env
 
 # virtualenv
 .venv

@@ -2,11 +2,10 @@
 Write pod data into the poddata table.
 """
 import sqlmodel
+from fastapi import APIRouter
 
-from hyperlink_api.logger import logger
-from hyperlink_api._application import app
-from hyperlink_api.database import engine
-from . import API_VERSION
+from src.core.logger import logger
+from src.core.database import engine
 
 from hyperlink_data_models.pod_data import (
     PodData,
@@ -14,11 +13,11 @@ from hyperlink_data_models.pod_data import (
     PodDataRead,
 )
 
-ENDPOINT_NAME = __name__.split('.')[-1]
+router = APIRouter()
 
 
-@app.post(
-    path=f"/{API_VERSION}/{ENDPOINT_NAME}/create_pod_data",
+@router.post(
+    path=f"/create_pod_data",
     response_model=PodData
 )
 def create_microcontroller_data(data: PodDataCreate) -> PodData:
@@ -43,8 +42,8 @@ def create_microcontroller_data(data: PodDataCreate) -> PodData:
         return PodData()
 
 
-@app.get(
-    path=f"/{API_VERSION}/{ENDPOINT_NAME}/read_pod_data",
+@router.get(
+    path=f"/read_pod_data",
     response_model=list[PodData]
 )
 def read_pod_data(n: int = 100) -> list[PodData]:

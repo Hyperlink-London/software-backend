@@ -4,11 +4,11 @@ from logging.handlers import RotatingFileHandler
 
 from datetime import datetime
 
-from hyperlink_api.constants import current_script_dir
+from src.core.constants import current_script_dir
 
 
 log_level = logging.WARNING
-log_file = f"logs/log-api-{datetime.now().strftime('%d-%m-%Y')}.log"
+log_file = f"log-api-{datetime.now().strftime('%d-%m-%Y')}.log"
 log_file_dir = os.path.join(current_script_dir, log_file)
 
 logger = logging.getLogger(__name__)
