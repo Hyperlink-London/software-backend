@@ -9,24 +9,20 @@ import json
 router = APIRouter()
 websocket_handler = WebSocketHandler()
 
-
 @router.websocket("/ws")
 async def websocket_data_endpoint(websocket: WebSocket):
     """
     WebSocket endpoint that handles connections using the WebSocketHandler.
     """
-    # First, explicitly accept the connection
-    await websocket.accept()
-    logger.info("WebSocket connection accepted")
-    
+    await websocket_handler.connect(websocket)
+    logger.info("WebSocket connection managed by WebSocketHandler")
     try:
-        # Then add to the handler's active connections
-        websocket_handler.active_connections.append(websocket)
-        logger.info(f"Client connected. Total connections: {len(websocket_handler.active_connections)}")
-        
         while True:
-            data = await websocket.receive_json()
             try:
+                # Receive JSON data using the handler
+                data = await websocket_handler.receive_json(websocket)
+
+                # Process the received data
                 pod_data_create = PodDataCreate(**data)
                 with sqlmodel.Session(engine) as session:
                     pod_data = PodData.from_orm(pod_data_create)
@@ -34,20 +30,22 @@ async def websocket_data_endpoint(websocket: WebSocket):
                     session.commit()
                     session.refresh(pod_data)
 
+                # TODO - Fix the Object of type datetime is not JSON serializable error
                 await websocket.send_json({
                     "message": "Pod data created successfully",
                     "data": pod_data.dict(),
                 })
                 await websocket_handler.broadcast_message(f"New pod data created: {pod_data.dict()}")
+
             except json.JSONDecodeError:
-                await websocket.send_json({"error": "Invalid JSON received"})
+                await websocket_handler.send_json(websocket, {"error": "Invalid JSON received"})
     except WebSocketDisconnect:
         logger.info("Client disconnected")
-        websocket_handler.active_connections.remove(websocket)
+        await websocket_handler.disconnect(websocket)
     except Exception as e:
         logger.error(f"Error in WebSocket connection: {str(e)}")
-        if websocket in websocket_handler.active_connections:
-            websocket_handler.active_connections.remove(websocket)
+        await websocket_handler.disconnect(websocket)
+
 
 
 @router.websocket("/ws/create_pod_data")
