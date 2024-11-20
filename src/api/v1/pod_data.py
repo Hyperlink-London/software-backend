@@ -21,7 +21,7 @@ async def websocket_data_endpoint(websocket: WebSocket):
             try:
                 # Receive JSON data using the handler
                 data = await websocket_handler.receive_json(websocket)
-
+                logger.info(f"Received data: {data}")
                 # Process the received data
                 pod_data_create = PodDataCreate(**data)
                 with sqlmodel.Session(engine) as session:
@@ -44,7 +44,6 @@ async def websocket_data_endpoint(websocket: WebSocket):
         await websocket_handler.disconnect(websocket)
     except Exception as e:
         logger.error(f"Error in WebSocket connection: {str(e)}")
-        await websocket_handler.disconnect(websocket)
 
 
 
