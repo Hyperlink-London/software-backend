@@ -2,15 +2,15 @@ import sqlmodel
 from fastapi import HTTPException
 from starlette.status import HTTP_201_CREATED
 from sqlalchemy.exc import SQLAlchemyError
+from fastapi import APIRouter
+
+from src.core.database import engine  # Import the engine from your database file
 from hyperlink_data_models.test import Test, TestCreate  # Adjust import paths as needed
-from hyperlink_api.database import engine  # Import the engine from your database file
-from hyperlink_api._application import app
-from . import API_VERSION
 
-ENDPOINT_NAME = __name__.split('.')[-1]
+router = APIRouter()
 
 
-@app.post(f"/{API_VERSION}/{ENDPOINT_NAME}/test/", response_model=Test, status_code=HTTP_201_CREATED)
+@router.post(f"/test/", response_model=Test, status_code=HTTP_201_CREATED)
 async def create_test(test: TestCreate):
     """
     Endpoint to create a new record in the Test table.

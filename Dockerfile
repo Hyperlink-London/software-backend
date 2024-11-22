@@ -1,21 +1,16 @@
-# Use an official Python image as the base
-FROM python:3.10-slim
+FROM python:3.12-slim
 
-# Set the working directory
 WORKDIR /app
 
-# Copy only the requirements file first for better caching
+COPY api_entrypoint.sh .
+
 COPY requirements.txt .
 
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install the application in editable mode
-COPY . .
-RUN pip install -e .
+COPY src ./src
+COPY hyperlink_data_models ./hyperlink_data_models
 
-# Expose the port your FastAPI app runs on
-EXPOSE 8000
 
 # Run the create_tables.py script before starting the API
-CMD ["sh", "-c", "python create_tables.py && hyperlink-api --dev"]
+CMD ["sh", "api_entrypoint.sh"]
