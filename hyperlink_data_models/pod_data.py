@@ -78,6 +78,6 @@ class PodDataRead(PodDataBase):
 
 class PodDataUpdate(sqlmodel.SQLModel):
     """
-    Model for updating existing microcontroller data records.
+    Model for updating existing pod data records.
     """
     pass
