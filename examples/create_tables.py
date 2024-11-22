@@ -1,7 +1,9 @@
 from sqlmodel import SQLModel, create_engine
 
 # without these imports, the tables do not get created (even though the imports are not used in the script)
-# will add here
+from hyperlink_data_models.pod_data import PodData
+from hyperlink_data_models.pod_states import PodState
+from hyperlink_data_models.pod_battery import PodBattery
 
 DEV = False
 
