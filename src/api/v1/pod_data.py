@@ -1,5 +1,6 @@
 import sqlmodel
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.encoders import jsonable_encoder
 from src.core.database import engine
 from hyperlink_data_models.pod_data import PodData, PodDataCreate
 from src.core.logger import logger
@@ -8,6 +9,7 @@ import json
 
 router = APIRouter()
 websocket_handler = WebSocketHandler()
+
 
 @router.websocket("/ws")
 async def websocket_data_endpoint(websocket: WebSocket):
@@ -22,6 +24,7 @@ async def websocket_data_endpoint(websocket: WebSocket):
                 # Receive JSON data using the handler
                 data = await websocket_handler.receive_json(websocket)
                 logger.info(f"Received data: {data}")
+
                 # Process the received data
                 pod_data_create = PodDataCreate(**data)
                 with sqlmodel.Session(engine) as session:
@@ -30,12 +33,15 @@ async def websocket_data_endpoint(websocket: WebSocket):
                     session.commit()
                     session.refresh(pod_data)
 
-                # TODO - Fix the Object of type datetime is not JSON serializable error
+                # Serialize the pod_data with JSON-compatible encoding
+                pod_data_serialized = jsonable_encoder(pod_data)
+
+                # Send the JSON-serialised data to the client
                 await websocket.send_json({
                     "message": "Pod data created successfully",
-                    "data": pod_data.dict(),
+                    "data": pod_data_serialized,
                 })
-                await websocket_handler.broadcast_message(f"New pod data created: {pod_data.dict()}")
+                await websocket_handler.broadcast_message(f"New pod data created: {pod_data_serialized}")
 
             except json.JSONDecodeError:
                 await websocket_handler.send_json(websocket, {"error": "Invalid JSON received"})
