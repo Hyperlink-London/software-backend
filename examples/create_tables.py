@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, create_engine
-import os
 from dotenv import load_dotenv
+import os
 
 # without these imports, the tables do not get created (even though the imports are not used in the script)
 from hyperlink_data_models.pod_data import PodData
