@@ -4,6 +4,7 @@ from src.api.v1.checkers import router as checker_router
 from src.api.v1.pod_data import router as pod_data_router
 from src.api.v1.pod_states import router as pod_states_router
 from src.api.v1.pod_battery import router as pod_battery_router
+from src.api.v1.commands import router as commands_router
 
 router = APIRouter()
 
@@ -11,3 +12,6 @@ router.include_router(checker_router)
 router.include_router(pod_data_router)
 router.include_router(pod_states_router)
 router.include_router(pod_battery_router)
+router.include_router(commands_router)
+
+
