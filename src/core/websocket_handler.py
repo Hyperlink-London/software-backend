@@ -1,15 +1,16 @@
 from typing import List
 from fastapi import WebSocket, WebSocketDisconnect
 from src.core.logger import logger
-
+import json
 
 class WebSocketHandler:
     """
     A class to manage WebSocket connections and broadcasting messages.
     """
 
-    def __init__(self):
+    def __init__(self, default_url: str = "ws://localhost:8000"):
         self.active_connections: List[WebSocket] = []
+        self.default_url = default_url
 
     async def connect(self, websocket: WebSocket):
         """
@@ -40,11 +41,12 @@ class WebSocketHandler:
         return await websocket.receive_json()
 
     async def broadcast(self, message: str):
-        """
-        Sends a message to all connected WebSocket clients.
-        """
         for connection in self.active_connections:
+            print(connection)
             try:
                 await connection.send_text(message)
             except Exception as e:
                 logger.error(f"Failed to send message to a client: {str(e)}")
+
+websocket_handler = WebSocketHandler()
+

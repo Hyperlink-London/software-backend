@@ -4,7 +4,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
 
 from hyperlink_data_models.pod_data import PodData, PodDataCreate
-from src.core.websocket_handler import WebSocketHandler
+from src.core.websocket_handler import websocket_handler
 from src.core.database import engine
 from src.core.logger import logger
 from . import API_VERSION
@@ -12,7 +12,6 @@ from . import API_VERSION
 ENDPOINT_NAME = __name__.split('.')[-1]
 
 router = APIRouter()
-websocket_handler = WebSocketHandler()
 
 
 @router.websocket("/ws/create_pod_data")
@@ -45,7 +44,7 @@ async def websocket_create_pod_data(websocket: WebSocket):
                     "message": "Pod data created successfully",
                     "data": pod_data_serialized,
                 })
-                await websocket_handler.broadcast_message(f"New pod data created: {pod_data_serialized}")
+                await websocket_handler.broadcast(f"New pod data created: {pod_data_serialized}")
 
             except json.JSONDecodeError:
                 await websocket_handler.send_json(websocket, {"error": "Invalid JSON received"})
