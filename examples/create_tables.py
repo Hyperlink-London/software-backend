@@ -6,6 +6,7 @@ import os
 from hyperlink_data_models.pod_data import PodData
 from hyperlink_data_models.pod_states import PodState
 from hyperlink_data_models.pod_battery import PodBattery
+from hyperlink_data_models.commands import Command
 
 # Determine the root directory of the project (one level up from current directory)
 current_script_dir = os.path.dirname(os.path.abspath(__file__))
