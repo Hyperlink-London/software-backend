@@ -10,6 +10,7 @@ class PodStateBase(sqlmodel.SQLModel):
     """
     breaking_state: Optional[str] = None
     propulsion_state: Optional[str] = None
+    structures_state: Optional[str] = None
     pod_state: Optional[str] = None
 
 
