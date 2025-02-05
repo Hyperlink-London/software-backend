@@ -19,6 +19,7 @@ class PodDataBase(sqlmodel.SQLModel):
     brake_version: Optional[str] = None
     propulsion_version: Optional[str] = None
     pod_version: Optional[str] = None
+    uuid: Optional[str] = None
 
 
 class PodData(PodDataBase, table=True):
