@@ -7,8 +7,6 @@ This project, hyperlink-api, is a Python-based API designed to interface with hy
 
 hyperlink-api is a Python-based API designed to interface with hyperlink databases. It provides a set of endpoints to interact with data defined in the hyperlink_data_models.
 
-<details>
-  <summary>Installation</summary>
 You can install `hyperlink-api` via git:
 
     ```bash
@@ -29,10 +27,3 @@ You can install `hyperlink-api` via git:
     ```bash
     docker compose up
     ```
-</details>
-
-<details>
-  <summary>Sensor Data Information</summary>
-    ## Breaking
-
-</details>
