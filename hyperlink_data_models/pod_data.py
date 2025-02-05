@@ -1,3 +1,5 @@
+from sqlalchemy.dialects.postgresql import UUID as SQLAlchemyUUID
+from uuid import UUID, uuid4
 from datetime import datetime
 from typing import Optional
 
@@ -20,16 +22,16 @@ class PodDataBase(sqlmodel.SQLModel):
 
     # Structures data
     temperature_celsius_structures: Optional[float] = None
-    vibration_structures: Optional[float] = None
-    deformation_structures: Optional[float] = None
+    vibration_structures: Optional[float] = None  # TODO: find out what this is measuring and in what units
+    deformation_structures: Optional[float] = None  # TODO: find out what this is measuring and in what units
 
     # Misc data
+    uuid: UUID | None = sqlmodel.Field(default_factory=uuid4, sa_column=sqlmodel.Column(SQLAlchemyUUID, primary_key=False))  # This is to identify each pud run
 
     # component versions
     brake_version: Optional[str] = None
     propulsion_version: Optional[str] = None
     pod_version: Optional[str] = None
-    uuid: Optional[str] = None  # TODO: what was this for?...
 
 
 class PodData(PodDataBase, table=True):
