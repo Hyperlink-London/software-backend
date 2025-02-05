@@ -8,12 +8,18 @@ class PodDataBase(sqlmodel.SQLModel):
     """
     Base class for pod data models, defining common sensor attributes.
     """
-    # sensors
+    # Braking data
     temperature_celsius_brake: Optional[float] = None
+
+    # Propulsion data
     temperature_celsius_propulsion_1: Optional[float] = None
     temperature_celsius_propulsion_2: Optional[float] = None
+
+    # Suspension data
     rpm: Optional[float] = None
     speed_m_per_s: Optional[float] = None
+
+    # Misc data
 
     # component versions
     brake_version: Optional[str] = None
