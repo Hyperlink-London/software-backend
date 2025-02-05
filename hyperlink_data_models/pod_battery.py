@@ -9,7 +9,9 @@ class PodBatteryBase(sqlmodel.SQLModel):
     Base class for pod battery models, defining pod batteries
     """
     pod_battery_percentage: Optional[float] = None
-
+    pod_battery_voltage: Optional[float] = None
+    pod_battery_current: Optional[float] = None
+    pod_battery_temperature: Optional[float] = None
 
 
 class PodBattery(PodBatteryBase, table=True):
