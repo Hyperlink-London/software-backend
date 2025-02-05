@@ -27,3 +27,17 @@ You can install `hyperlink-api` via git:
     ```bash
     docker compose up
     ```
+
+## Sensor Data Information
+### Breaking
+- Temperature
+
+### Propulsion
+- Temperature
+- Speed
+- Acceleration
+
+### Structures
+- Temperature
+- Vibrations
+- Deformation
