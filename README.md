@@ -29,7 +29,7 @@ You can install `hyperlink-api` via git:
     ```
 
 ## Sensor Data Information
-### Breaking
+### Braking
 - Temperature
 
 ### Propulsion

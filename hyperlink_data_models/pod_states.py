@@ -8,7 +8,7 @@ class PodStateBase(sqlmodel.SQLModel):
     """
     Base class for pod state models, defining pod states
     """
-    breaking_state: Optional[str] = None
+    braking_state: Optional[str] = None
     propulsion_state: Optional[str] = None
     structures_state: Optional[str] = None
     pod_state: Optional[str] = None
