@@ -3,7 +3,13 @@ import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
 
-from hyperlink_data_models.pod_data import PodData, PodDataCreate
+from hyperlink_data_models.pod_data import (
+    PodData,
+    PodDataCreate,
+    BrakingDataResponse,
+    PropulsionDataResponse,
+    StructureDataResponse
+)
 from src.core.websocket_handler import WebSocketHandler
 from src.core.database import engine
 from src.core.logger import logger
@@ -45,7 +51,8 @@ async def websocket_create_pod_data(websocket: WebSocket):
                     "message": "Pod data created successfully",
                     "data": pod_data_serialized,
                 })
-                await websocket_handler.broadcast_message(f"New pod data created: {pod_data_serialized}")
+                # TODO: look into below, it killed the ws connection
+                # await websocket_handler.broadcast_message(f"New pod data created: {pod_data_serialized}")
 
             except json.JSONDecodeError:
                 await websocket_handler.send_json(websocket, {"error": "Invalid JSON received"})
@@ -62,7 +69,7 @@ async def websocket_create_pod_data(websocket: WebSocket):
 )
 def read_pod_data(n: int = 100) -> list[PodData]:
     """
-    Fetches the last n data points from the pod data table.
+    Fetches the last n data points from the pod data table (all columns)
 
     Parameters:
         n: The number of data points to retrieve, 100 by default.
@@ -79,6 +86,100 @@ def read_pod_data(n: int = 100) -> list[PodData]:
             data = session.exec(statement).all()
             logger.debug(f"encountered no errors")
             return [PodData.from_orm(row) for row in data]
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        return []
+
+
+@router.get(
+    path=f"/{API_VERSION}/{ENDPOINT_NAME}/braking",
+    response_model=list[BrakingDataResponse]
+)
+def get_braking_data(n: int = 100) -> list[BrakingDataResponse]:
+    """
+    Get the last n datapoints from the PodData table from column temperature_celsius_braking.
+    """
+    try:
+        statement = (
+                    sqlmodel.select(PodData.temperature_celsius_braking, PodData.brake_version)
+                    .order_by(PodData.time)
+                    .limit(n)
+        )
+
+        with sqlmodel.Session(engine) as session:
+            data = session.exec(statement).all()
+
+        logger.debug("Encountered no errors")
+
+        # Reverse to maintain chronological order
+        return list(reversed([row for row in data if row is not None]))
+
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        return []
+
+
+@router.get(
+    path=f"/{API_VERSION}/{ENDPOINT_NAME}/propulsion",
+    response_model=list[PropulsionDataResponse]
+)
+def get_propulsion_data(n: int = 100) -> list[PropulsionDataResponse]:
+    """
+    """
+    try:
+        statement = (
+                    sqlmodel.select(
+                        PodData.temperature_celsius_propulsion_1,
+                        PodData.temperature_celsius_propulsion_2,
+                        PodData.acceleration_m_per_s2_propulsion,
+                        PodData.speed_m_per_s_propulsion,
+                        PodData.rpm_propulsion,
+                        PodData.propulsion_version
+                    )
+                    .order_by(PodData.time)
+                    .limit(n)
+        )
+
+        with sqlmodel.Session(engine) as session:
+            data = session.exec(statement).all()
+
+        logger.debug("Encountered no errors")
+
+        # Reverse to maintain chronological order
+        return list(reversed([row for row in data if row is not None]))
+
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        return []
+
+
+@router.get(
+    path=f"/{API_VERSION}/{ENDPOINT_NAME}/structures",
+    response_model=list[StructureDataResponse]
+)
+def get_structures_data(n: int = 100) -> list[StructureDataResponse]:
+    """
+    """
+    try:
+        statement = (
+                    sqlmodel.select(
+                        PodData.temperature_celsius_structures,
+                        PodData.vibration_structures,
+                        PodData.deformation_structures,
+                        PodData.structure_version
+                    )
+                    .order_by(PodData.time)
+                    .limit(n)
+        )
+
+        with sqlmodel.Session(engine) as session:
+            data = session.exec(statement).all()
+
+        logger.debug("Encountered no errors")
+
+        # Reverse to maintain chronological order
+        return list(reversed([row for row in data if row is not None]))
+
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         return []

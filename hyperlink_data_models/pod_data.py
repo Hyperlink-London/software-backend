@@ -1,7 +1,9 @@
 from sqlalchemy.dialects.postgresql import UUID as SQLAlchemyUUID
-from uuid import UUID, uuid4
+from pydantic import BaseModel
 from datetime import datetime
+from uuid import UUID, uuid4
 from typing import Optional
+
 
 import sqlmodel
 
@@ -26,11 +28,13 @@ class PodDataBase(sqlmodel.SQLModel):
     deformation_structures: Optional[float] = None  # TODO: find out what this is measuring and in what units
 
     # Misc data
-    uuid: UUID | None = sqlmodel.Field(default_factory=uuid4, sa_column=sqlmodel.Column(SQLAlchemyUUID, primary_key=False))  # This is to identify each pud run
+    # TODO: fix this, its causing an error which kills the ws connection...
+    # uuid: UUID | None = sqlmodel.Field(default_factory=uuid4, sa_column=sqlmodel.Column(SQLAlchemyUUID, primary_key=False))  # This is to identify each pud run
 
     # component versions
     brake_version: Optional[str] = None
     propulsion_version: Optional[str] = None
+    structure_version: Optional[str] = None
     pod_version: Optional[str] = None
 
 
@@ -94,3 +98,32 @@ class PodDataUpdate(sqlmodel.SQLModel):
     Model for updating existing pod data records.
     """
     pass
+
+
+class BrakingDataResponse(BaseModel):
+    """
+    """
+    temperature_celsius_braking: float
+    brake_version: str
+
+
+class PropulsionDataResponse(BaseModel):
+    """
+    """
+    temperature_celsius_propulsion_1: float
+    temperature_celsius_propulsion_2: float
+    acceleration_m_per_s2_propulsion: float
+    speed_m_per_s_propulsion: float
+    rpm_propulsion: float
+    propulsion_version: str
+
+
+class StructureDataResponse(BaseModel):
+    """
+    """
+    temperature_celsius_structures: float
+    vibration_structures: float
+    deformation_structures: float
+    structure_version: str
+
+
