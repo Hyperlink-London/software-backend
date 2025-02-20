@@ -82,7 +82,7 @@ def read_pod_states(n: int = 1) -> list[PodStateRead]:
         with sqlmodel.Session(engine) as session:
             data = session.exec(statement).all()
             logger.debug(f"encountered no errors")
-            return [PodState.from_orm(row) for row in data]
+            return [PodStateRead.from_orm(row) for row in data]
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         return []
