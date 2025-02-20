@@ -112,7 +112,7 @@ def get_braking_data(n: int = 100) -> list[BrakingDataResponse]:
         logger.debug("Encountered no errors")
 
         # Reverse to maintain chronological order
-        return list(reversed([row for row in data if row is not None]))
+        return list(reversed([row for row in data if row is not None]))  # TODO: not sure about this tbh
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
@@ -146,7 +146,7 @@ def get_propulsion_data(n: int = 100) -> list[PropulsionDataResponse]:
         logger.debug("Encountered no errors")
 
         # Reverse to maintain chronological order
-        return list(reversed([row for row in data if row is not None]))
+        return list(reversed([row for row in data if row is not None]))  # TODO: not sure about this tbh
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
@@ -178,7 +178,7 @@ def get_structures_data(n: int = 100) -> list[StructureDataResponse]:
         logger.debug("Encountered no errors")
 
         # Reverse to maintain chronological order
-        return list(reversed([row for row in data if row is not None]))
+        return list(reversed([row for row in data if row is not None]))  # TODO: not sure about this tbh
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
