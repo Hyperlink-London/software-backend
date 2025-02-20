@@ -3,7 +3,7 @@ import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
 
-from hyperlink_data_models.pod_battery import PodBattery, PodBatteryCreate
+from hyperlink_data_models.pod_battery import PodBattery, PodBatteryCreate, PodBatteryRead
 from src.core.websocket_handler import WebSocketHandler
 from src.core.database import engine
 from src.core.logger import logger
@@ -57,10 +57,10 @@ async def websocket_create_pod_data(websocket: WebSocket):
 
 
 @router.get(
-    path=f"/{API_VERSION}/{ENDPOINT_NAME}/read_pod_batteries",
-    response_model=list[PodBattery]
+    path=f"/{API_VERSION}/{ENDPOINT_NAME}/read_pod_battery",
+    response_model=list[PodBatteryRead]
 )
-def read_pod_batteries(n: int = 100) -> list[PodBattery]:
+def read_pod_batteries(n: int = 100) -> list[PodBatteryRead]:
     """
     Fetches the last n data points from the pod battery table.
 
@@ -78,7 +78,7 @@ def read_pod_batteries(n: int = 100) -> list[PodBattery]:
         with sqlmodel.Session(engine) as session:
             data = session.exec(statement).all()
             logger.debug(f"encountered no errors")
-            return [PodBattery.from_orm(row) for row in data]
+            return [PodBatteryRead.from_orm(row) for row in data]
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         return []
