@@ -3,7 +3,11 @@ import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.encoders import jsonable_encoder
 
-from hyperlink_data_models.pod_states import PodState, PodStateCreate
+from hyperlink_data_models.pod_states import (
+    PodState,
+    PodStateCreate,
+    PodStateRead
+)
 from src.core.websocket_handler import WebSocketHandler
 from src.core.database import engine
 from src.core.logger import logger
@@ -58,14 +62,14 @@ async def websocket_create_pod_data(websocket: WebSocket):
 
 @router.get(
     path=f"/{API_VERSION}/{ENDPOINT_NAME}/read_pod_states",
-    response_model=list[PodState]
+    response_model=list[PodStateRead]
 )
-def read_pod_states(n: int = 100) -> list[PodState]:
+def read_pod_states(n: int = 1) -> list[PodStateRead]:
     """
     Fetches the last n data points from the pod state table.
 
     Parameters:
-        n: The number of data points to retrieve, 100 by default.
+        n: The number of data points to retrieve, 1 by default.
 
     Returns:
         A list of PodDataRead objects, containing the retrieved data.

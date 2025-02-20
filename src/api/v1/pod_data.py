@@ -6,6 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from hyperlink_data_models.pod_data import (
     PodData,
     PodDataCreate,
+    PodDataRead,
     BrakingDataResponse,
     PropulsionDataResponse,
     StructureDataResponse
@@ -65,9 +66,9 @@ async def websocket_create_pod_data(websocket: WebSocket):
 
 @router.get(
     path=f"/{API_VERSION}/{ENDPOINT_NAME}/read_pod_data",
-    response_model=list[PodData]
+    response_model=list[PodDataRead]
 )
-def read_pod_data(n: int = 100) -> list[PodData]:
+def read_pod_data(n: int = 100) -> list[PodDataRead]:
     """
     Fetches the last n data points from the pod data table (all columns)
 
