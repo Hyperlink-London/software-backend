@@ -1,15 +1,13 @@
 import sqlmodel
 import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
 from hyperlink_data_models.pod_data import (
     PodData,
     PodDataCreate,
     PodDataRead,
-    BrakingDataResponse,
-    PropulsionDataResponse,
-    StructureDataResponse
 )
 from src.core.websocket_handler import WebSocketHandler
 from src.core.database import engine
@@ -94,17 +92,21 @@ def read_pod_data(n: int = 100) -> list[PodDataRead]:
 
 @router.get(
     path=f"/{API_VERSION}/{ENDPOINT_NAME}/braking",
-    response_model=list[BrakingDataResponse]
+    response_model=dict
 )
-def get_braking_data(n: int = 100) -> list[BrakingDataResponse]:
+def get_braking_data(n: int = 100) -> JSONResponse:
     """
-    Get the last n datapoints from the PodData table from column temperature_celsius_braking.
+    Get the last n data points for braking system metrics, including time.
     """
     try:
         statement = (
-                    sqlmodel.select(PodData.temperature_celsius_braking, PodData.brake_version)
-                    .order_by(PodData.time)
-                    .limit(n)
+            sqlmodel.select(
+                PodData.time,
+                PodData.temperature_celsius_braking,
+                PodData.brake_version
+            )
+            .order_by(PodData.time.desc())
+            .limit(n)
         )
 
         with sqlmodel.Session(engine) as session:
@@ -112,33 +114,45 @@ def get_braking_data(n: int = 100) -> list[BrakingDataResponse]:
 
         logger.debug("Encountered no errors")
 
-        # Reverse to maintain chronological order
-        return list(reversed([row for row in data if row is not None]))  # TODO: not sure about this tbh
+        braking_data = [
+            {
+                "time": row[0].isoformat(),  # This converts the datetime obj to a string to avoid the "datetime not serialisable error",
+                "temperature_celsius_braking": row[1],
+            }
+            for row in reversed(data) if row[1] is not None
+        ]
+
+        brake_versions = {row[2] for row in data if row[2] is not None}
+        brake_version = brake_versions.pop() if brake_versions else None
+
+        return JSONResponse(content={"data": braking_data, "misc": {"brake_version": brake_version}})
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
-        return []
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 
 @router.get(
     path=f"/{API_VERSION}/{ENDPOINT_NAME}/propulsion",
-    response_model=list[PropulsionDataResponse]
+    response_model=dict
 )
-def get_propulsion_data(n: int = 100) -> list[PropulsionDataResponse]:
+def get_propulsion_data(n: int = 100) -> JSONResponse:
     """
+    Get the last n data points for propulsion system metrics, including time.
     """
     try:
         statement = (
-                    sqlmodel.select(
-                        PodData.temperature_celsius_propulsion_1,
-                        PodData.temperature_celsius_propulsion_2,
-                        PodData.acceleration_m_per_s2_propulsion,
-                        PodData.speed_m_per_s_propulsion,
-                        PodData.rpm_propulsion,
-                        PodData.propulsion_version
-                    )
-                    .order_by(PodData.time)
-                    .limit(n)
+            sqlmodel.select(
+                PodData.time,
+                PodData.temperature_celsius_propulsion_1,
+                PodData.temperature_celsius_propulsion_2,
+                PodData.acceleration_m_per_s2_propulsion,
+                PodData.speed_m_per_s_propulsion,
+                PodData.rpm_propulsion,
+                PodData.propulsion_version
+            )
+            .order_by(PodData.time.desc())
+            .limit(n)
         )
 
         with sqlmodel.Session(engine) as session:
@@ -146,31 +160,47 @@ def get_propulsion_data(n: int = 100) -> list[PropulsionDataResponse]:
 
         logger.debug("Encountered no errors")
 
-        # Reverse to maintain chronological order
-        return list(reversed([row for row in data if row is not None]))  # TODO: not sure about this tbh
+        propulsion_data = [
+            {
+                "time": row[0].isoformat(),  # This converts the datetime obj to a string to avoid the "datetime not serialisable error",
+                "temperature_celsius_propulsion_1": row[1],
+                "temperature_celsius_propulsion_2": row[2],
+                "acceleration_m_per_s2_propulsion": row[3],
+                "speed_m_per_s_propulsion": row[4],
+                "rpm_propulsion": row[5],
+            }
+            for row in reversed(data) if row[1] is not None
+        ]
+
+        propulsion_versions = {row[6] for row in data if row[6] is not None}
+        propulsion_version = propulsion_versions.pop() if propulsion_versions else None
+
+        return JSONResponse(content={"data": propulsion_data, "misc": {"propulsion_version": propulsion_version}})
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
-        return []
+        return JSONResponse(content={"error": str(e)}, status_code=500)
 
 
 @router.get(
     path=f"/{API_VERSION}/{ENDPOINT_NAME}/structures",
-    response_model=list[StructureDataResponse]
+    response_model=dict
 )
-def get_structures_data(n: int = 100) -> list[StructureDataResponse]:
+def get_structures_data(n: int = 100) -> JSONResponse:
     """
+    Get the last n data points for structural system metrics, including time.
     """
     try:
         statement = (
-                    sqlmodel.select(
-                        PodData.temperature_celsius_structures,
-                        PodData.vibration_structures,
-                        PodData.deformation_structures,
-                        PodData.structure_version
-                    )
-                    .order_by(PodData.time)
-                    .limit(n)
+            sqlmodel.select(
+                PodData.time,
+                PodData.temperature_celsius_structures,
+                PodData.vibration_structures,
+                PodData.deformation_structures,
+                PodData.structure_version
+            )
+            .order_by(PodData.time.desc())
+            .limit(n)
         )
 
         with sqlmodel.Session(engine) as session:
@@ -178,9 +208,21 @@ def get_structures_data(n: int = 100) -> list[StructureDataResponse]:
 
         logger.debug("Encountered no errors")
 
-        # Reverse to maintain chronological order
-        return list(reversed([row for row in data if row is not None]))  # TODO: not sure about this tbh
+        structures_data = [
+            {
+                "time": row[0].isoformat(),  # This converts the datetime obj to a string to avoid the "datetime not serialisable error"
+                "temperature_celsius_structures": row[1],
+                "vibration_structures": row[2],
+                "deformation_structures": row[3],
+            }
+            for row in reversed(data) if row[1] is not None
+        ]
+
+        structure_versions = {row[4] for row in data if row[4] is not None}
+        structure_version = structure_versions.pop() if structure_versions else None
+
+        return JSONResponse(content={"data": structures_data, "misc": {"structure_version": structure_version}})
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")
-        return []
+        return JSONResponse(content={"error": str(e)}, status_code=500)

@@ -102,6 +102,7 @@ class PodDataUpdate(sqlmodel.SQLModel):
 
 class BrakingDataResponse(BaseModel):
     """
+    DEP
     """
     temperature_celsius_braking: float
     brake_version: str
@@ -109,6 +110,7 @@ class BrakingDataResponse(BaseModel):
 
 class PropulsionDataResponse(BaseModel):
     """
+    DEP
     """
     temperature_celsius_propulsion_1: float
     temperature_celsius_propulsion_2: float
@@ -120,6 +122,7 @@ class PropulsionDataResponse(BaseModel):
 
 class StructureDataResponse(BaseModel):
     """
+    DEP
     """
     temperature_celsius_structures: float
     vibration_structures: float
