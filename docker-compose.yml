@@ -30,8 +30,27 @@ services:
     networks:
       - hyperlink_network  # Attach to the custom network
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_container
+    restart: unless-stopped
+    ports:
+      - "8081:80" # Access pgAdmin at http://localhost:8081
+    environment:
+      PGADMIN_DEFAULT_EMAIL: barnish.harry@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./servers.json:/pgadmin4/servers.json
+    networks:
+      - hyperlink_network
+
 volumes:
   postgres_data:
+  pgadmin_data:
 
 networks:
   hyperlink_network:
