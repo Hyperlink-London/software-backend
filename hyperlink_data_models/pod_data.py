@@ -37,6 +37,8 @@ class PodDataBase(sqlmodel.SQLModel):
     structure_version: Optional[str] = None
     pod_version: Optional[str] = None
 
+    run_id: Optional[int] = None
+
 
 class PodData(PodDataBase, table=True):
     """
