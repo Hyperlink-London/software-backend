@@ -10,21 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: postgres:13
-        env:
-          POSTGRES_USER: hyperlink
-          POSTGRES_PASSWORD: hyperlink_psw
-          POSTGRES_DB: hyperlink_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U hyperlink"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
