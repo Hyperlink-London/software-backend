@@ -42,7 +42,7 @@ jobs:
           EOF
 
       - name: Build and start containers
-        run: docker-compose up -d --build
+        run: docker compose up --build
 
       - name: Wait for API to be ready
         run: |
