@@ -52,7 +52,7 @@ class PodData(PodDataBase, table=True):
         time: Timestamp for the data record, including timezone information.
     """
 
-    id: int | None = sqlmodel.Field(primary_key=True, default=None)
+    id: int | None = sqlmodel.Field(primary_key=True, default=None)  # TODO: change to not use and use uuid instead
     time: datetime = sqlmodel.Field(
         sa_column=sqlmodel.Column(
             sqlmodel.DateTime(timezone=True),
