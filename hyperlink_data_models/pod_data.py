@@ -37,7 +37,8 @@ class PodDataBase(sqlmodel.SQLModel):
     structure_version: Optional[str] = None
     pod_version: Optional[str] = None
 
-    run_id: Optional[int] = None
+    run_id: Optional[str] = None #Todo: Convert to UUID
+    demo: Optional[float] = None # Testing column for demo purposes
 
 
 class PodData(PodDataBase, table=True):

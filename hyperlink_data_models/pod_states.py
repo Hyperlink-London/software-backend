@@ -11,7 +11,7 @@ class PodStateBase(sqlmodel.SQLModel):
     braking_state: Optional[str] = None
     propulsion_state: Optional[str] = None
     pod_state: Optional[str] = None
-    run_id: Optional[int] = None
+    run_id: Optional[str] = None # Todo: Convert to UUID
 
 
 class PodState(PodStateBase, table=True):

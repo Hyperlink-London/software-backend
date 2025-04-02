@@ -12,7 +12,7 @@ class PodBatteryBase(sqlmodel.SQLModel):
     pod_battery_voltage: Optional[float] = None
     pod_battery_current: Optional[float] = None
     pod_battery_temperature: Optional[float] = None
-    run_id: Optional[int] = None
+    run_id: Optional[str] = None #Todo: Convert to UUID
 
 
 class PodBattery(PodBatteryBase, table=True):
