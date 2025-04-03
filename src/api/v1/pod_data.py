@@ -78,7 +78,7 @@ def read_pod_data(n: int = 100) -> list[PodDataRead]:
     """
     try:
         statement = sqlmodel.select(PodData) \
-            .order_by(PodData.time) \
+            .order_by(PodData.time.desc()) \
             .limit(n)
 
         with sqlmodel.Session(engine) as session:
